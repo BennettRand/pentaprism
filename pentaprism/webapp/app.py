@@ -4,6 +4,7 @@ import os.path
 from flask import Flask, request, jsonify, Response
 from flask.views import MethodView
 from PIL.Image import LANCZOS
+from sqlalchemy import extract
 
 from .models import Images, ExifData
 
@@ -72,7 +73,24 @@ class ImageView(MethodView):
         session = app.config['SESSION']()
 
         if img_id is None:
-            a = session.query(Images).all()
+            limit = min(int(request.args.get('limit', 50)), 100)
+            offset = int(request.args.get('offset', 0))
+
+            year = request.args.get('year')
+            month = request.args.get('month')
+            day = request.args.get('day')
+
+            q = session.query(Images)
+
+            if year is not None:
+                q = q.filter(extract('year', Images.timestamp) == year)
+            if month is not None:
+                q = q.filter(extract('month', Images.timestamp) == month)
+            if day is not None:
+                q = q.filter(extract('day', Images.timestamp) == day)
+
+            a = q.offset(offset).limit(limit).all()
+
             ret = {i.id: {'name': i.filename,
                           'timestamp': i.timestamp.isoformat(), 
                           'url': '/images/{}/'.format(i.id)} for i in a}
