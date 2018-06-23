@@ -138,8 +138,18 @@ class ImageView(MethodView):
         return ret
 
 
+@app.route('/filters/', methods=['GET'])
+def filters():
+    return ''
+
+
+@app.route('/ui/<path:path>')
+def ui(path):
+    return send_from_directory('static', path)
+
+
 image_view = ImageView.as_view('images')
 
 app.add_url_rule('/images/', view_func=image_view, methods=['POST', 'GET'])
 app.add_url_rule('/images/<int:img_id>/', view_func=image_view,
-                 methods=['GET', ])
+                 methods=['GET'])
