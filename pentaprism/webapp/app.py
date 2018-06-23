@@ -1,7 +1,7 @@
 import cStringIO
 import os.path
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_from_directory
 from flask.views import MethodView
 from PIL.Image import LANCZOS
 from sqlalchemy import extract
@@ -50,9 +50,10 @@ class ImageView(MethodView):
                                         rimg.filename)
                     else:
                         skipped.append(rimg.filename)
-                except Exception:
+                except Exception as e:
                     fname = Images._try_get_name(f)
-                    app.logger.error('Error Saving file filename=%s', fname)
+                    app.logger.error('Error Saving file filename=%s error=%s',
+                                     fname, e)
                     errored.append(fname)
 
         session.add_all(images)
@@ -118,16 +119,16 @@ class ImageView(MethodView):
                 width = 1280
 
             if width is None:
-                height = int(height)
                 scale = float(height) / float(h)
-                width = int(scale * float(w))
+                width = scale * float(w)
 
             if height is None:
-                width = int(width)
                 scale = float(width) / float(w)
-                height = int(scale * float(h))
+                height = scale * float(h)
 
-            pimg = pimg.resize((width, height), LANCZOS)   
+            height = int(height)
+            width = int(width)
+            pimg = pimg.resize((width, height), LANCZOS)
             buff = cStringIO.StringIO()
             pimg.save(buff, format=fmt)
 

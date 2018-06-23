@@ -60,7 +60,7 @@ class Images(Base):
             self._exif = exifread.process_file(self.file)
             self.file.seek(0)
 
-        return {k: v.printable for k, v in self._exif.items()}
+        return {k: str(v) for k, v in self._exif.items() if len(str(v)) <= 128}
 
     @property
     def raw_img(self):
@@ -71,7 +71,8 @@ class Images(Base):
         return self._im
 
     def get_timestamp(self):
-        ts = self.exif_dict['Image DateTime']
+        ts = self.exif_dict.get(
+            'Image DateTime', self.exif_dict['EXIF DateTimeOriginal'])
         return datetime.strptime(ts, '%Y:%m:%d %H:%M:%S')
 
     def pil_image(self):
@@ -86,7 +87,7 @@ class Images(Base):
         pimg.thumbnail((width, height))
         buff = cStringIO.StringIO()
         pimg.save(buff, format="JPEG")
-        return base64.b64encode(buff.getvalue())
+        return base64.urlsafe_b64encode(buff.getvalue())
 
     # def get_zip(self):
     #     directory = os.path.join(FILE_BASE, self.filepath)
