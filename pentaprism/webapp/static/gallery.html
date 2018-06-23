@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Gallery</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="/ui/scripts/gallery.js"></script>
+</head>
+
+<body>
+    <form id="picker" method="post" enctype="multipart/form-data">
+        Year <select name="year" onchange="FillMonth()">
+            <option>-</option>
+        </select>
+        Month <select name="month" onchange="FillDay()">
+            <option>-</option>
+        </select>
+        Day <select name="day" onchange="FillGallery()">
+            <option>-</option>
+        </select>
+    </form>
+    <div id="thumbnails"></div>
+</body>
+
+</html>
