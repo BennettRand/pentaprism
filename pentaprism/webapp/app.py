@@ -139,9 +139,54 @@ class ImageView(MethodView):
         return ret
 
 
-@app.route('/filters/', methods=['GET'])
-def filters():
-    return ''
+@app.route('/images/<int:img_id>/thumbnail/')
+def thumbnail(img_id):
+    ret = None
+    session = app.config['SESSION']()
+
+    img = session.query(Images).get(img_id)
+
+    if img is None:
+        ret = jsonify(error='Not found', id=img_id)
+        ret.status_code = 404
+        return ret
+
+    ret = 'data:image/jpeg;base64,{}'.format(img.thumbnail.data)
+
+    session.close()
+    return ret
+
+
+@app.route('/dates/', methods=['GET'])
+def dates():
+    session = app.config['SESSION']()
+
+    ret = {}
+
+    years = session.query(
+        extract('year', Images.timestamp)).distinct(
+        extract('year', Images.timestamp)).all()
+
+    for y in years:
+        y = y[0]
+        ret[y] = {}
+        months = session.query(
+            extract('month', Images.timestamp)).filter(
+            extract('year', Images.timestamp) == y).distinct(
+            extract('month', Images.timestamp)).all()
+
+        for m in months:
+            m = m[0]
+            days = session.query(
+                extract('day', Images.timestamp)).filter(
+                extract('year', Images.timestamp) == y).filter(
+                extract('month', Images.timestamp) == m).distinct(
+                extract('day', Images.timestamp)).all()
+
+            ret[y][m] = [d[0] for d in days]
+
+    session.close()
+    return jsonify(ret)
 
 
 @app.route('/ui/<path:path>')

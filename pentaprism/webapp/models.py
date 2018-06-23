@@ -87,7 +87,7 @@ class Images(Base):
         pimg.thumbnail((width, height))
         buff = cStringIO.StringIO()
         pimg.save(buff, format="JPEG")
-        return base64.urlsafe_b64encode(buff.getvalue())
+        return base64.b64encode(buff.getvalue())
 
     # def get_zip(self):
     #     directory = os.path.join(FILE_BASE, self.filepath)
