@@ -3,13 +3,16 @@
 
 <head>
     <title>Upload Raw Files</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="/ui/scripts/upload.js"></script>
 </head>
 
 <body>
-    <form method="post" enctype="multipart/form-data" action="/images/">
-        <input type="file" name="my_file[]" multiple>
-        <input type="submit" value="Upload">
+    <form id="fileform" method="post" enctype="multipart/form-data">
+        <input type="file" name="files[]" multiple />
     </form>
+    <button onclick="UploadFiles()">Upload</button>
+    <progress></progress>
 </body>
     
 </html>
