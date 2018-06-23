@@ -12,7 +12,6 @@ from .models import Images, ExifData
 app = Flask(__name__)
 
 app.config['BASIC_AUTH_FORCE'] = True
-app.config['BASE_PATH'] = './.raw_images/'
 
 basic_auth = BasicAuth(app)
 
