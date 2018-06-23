@@ -3,12 +3,18 @@ import os.path
 
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask.views import MethodView
+from flask_basicauth import BasicAuth
 from PIL.Image import LANCZOS
 from sqlalchemy import extract
 
 from .models import Images, ExifData
 
 app = Flask(__name__)
+
+app.config['BASIC_AUTH_FORCE'] = True
+app.config['BASE_PATH'] = './.raw_images/'
+
+basic_auth = BasicAuth(app)
 
 
 def thumbnail_cb(result):

@@ -1,8 +1,8 @@
 import logging
 import multiprocessing
 from multiprocessing.pool import ThreadPool
-import shutil
 
+from flask_basicauth import BasicAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -21,8 +21,7 @@ def init_app():
     app.config.update(
         ENGINE=engine,
         THREADPOOL=tp,
-        SESSION=session,
-        BASE_PATH='./.raw_images/'
+        SESSION=session
     )
 
     # Base.metadata.drop_all(engine)
