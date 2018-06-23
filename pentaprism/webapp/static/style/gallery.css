@@ -1,0 +1,8 @@
+#thumbnails a {
+    padding: 1px;
+}
+
+dt { font-weight: 700; }
+dt:after { content: ":"; }
+/* dt, dt:after, dd { display: inline; } */
+dd { margin: 0; }

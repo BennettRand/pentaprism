@@ -3,9 +3,11 @@
 
 <head>
     <title>Gallery</title>
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
     <script src="/ui/scripts/gallery.js"></script>
+    <link rel="stylesheet" href="/ui/style/gallery.css">
 </head>
 
 <body>
@@ -21,6 +23,10 @@
         </select>
     </form>
     <div id="thumbnails"></div>
+    <div id="info">
+        <div id="viewer"></div>
+        <div id="exif"><dl></dl></div>
+    </div>
 </body>
 
 </html>

@@ -25,19 +25,45 @@ function FillDay() {
     FillGallery();
 }
 
+function AddThumbnail(img) {
+    return function (data) {
+        $("#thumbnails").append(
+            $("<a>").attr("onclick", `LoadImage("${img.url}")`).append(
+                $("<img>").attr("src", data)
+            )
+        );
+    };
+};
+
+function LoadImage(url) {
+    $("#viewer").empty();
+    $("#exif>dl").empty();
+    
+    image = new Image();
+    image.src = url;
+    
+    $("#viewer").append(image);
+    
+    $.get(url + "exif/", function(data){
+        for (var key in data) {
+            $("#exif>dl").append($("<dt/>").text(key));
+            $("#exif>dl").append($("<dd/>").text(data[key]));
+        }
+    });
+}
+
 function FillGallery() {
     year = $('#picker>[name="year"]').find(":selected").text();
     month = $('#picker>[name="month"]').find(":selected").text();
     day = $('#picker>[name="day"]').find(":selected").text();
-    $.get(`/images/?year=${year}&month=${month}&day=${day}`, (d) => {
+    $.get(`/images/?year=${year}&month=${month}&day=${day}`, (data) => {
         $("#thumbnails").empty();
-        for (var id in d) {
-            img = d[id];
-            $.get(img.url + "thumbnail/", (d) => {
-                $("#thumbnails").append($('<img>').attr("src", d));
-            });
+        for (var id in data) {
+            img = data[id];
+            $.get(img.url + "thumbnail/", AddThumbnail(img));
         }
     });
+    $("#viewer").attr("src", "");
 }
 
 $(document).ready(function () {

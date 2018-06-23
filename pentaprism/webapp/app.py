@@ -74,7 +74,7 @@ class ImageView(MethodView):
         session = app.config['SESSION']()
 
         if img_id is None:
-            limit = min(int(request.args.get('limit', 50)), 100)
+            limit = min(int(request.args.get('limit', 500)), 1000)
             offset = int(request.args.get('offset', 0))
 
             year = request.args.get('year')
@@ -152,6 +152,24 @@ def thumbnail(img_id):
         return ret
 
     ret = 'data:image/jpeg;base64,{}'.format(img.thumbnail.data)
+
+    session.close()
+    return ret
+
+
+@app.route('/images/<int:img_id>/exif/')
+def exif(img_id):
+    ret = None
+    session = app.config['SESSION']()
+
+    img = session.query(Images).get(img_id)
+
+    if img is None:
+        ret = jsonify(error='Not found', id=img_id)
+        ret.status_code = 404
+        return ret
+
+    ret = jsonify({e.key: e.value for e in img.exif})
 
     session.close()
     return ret

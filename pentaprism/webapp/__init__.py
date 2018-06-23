@@ -25,11 +25,11 @@ def init_app():
         BASE_PATH='./.raw_images/'
     )
 
-    Base.metadata.drop_all(engine)
-    try:
-        shutil.rmtree(app.config['BASE_PATH'])
-    except WindowsError:
-        pass
+    # Base.metadata.drop_all(engine)
+    # try:
+    #     shutil.rmtree(app.config['BASE_PATH'])
+    # except WindowsError:
+    #     pass
 
     Base.metadata.create_all(engine)
 
