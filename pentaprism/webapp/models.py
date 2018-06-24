@@ -71,8 +71,12 @@ class Images(Base):
         return self._im
 
     def get_timestamp(self):
-        ts = self.exif_dict.get(
-            'Image DateTime', self.exif_dict['EXIF DateTimeOriginal'])
+        ks = ['Image DateTimeOriginal', 'EXIF DateTimeOriginal',
+              'Image DateTime', 'EXIF DateTime']
+        for k in ks:
+            ts = self.exif_dict.get(k)
+            if ts is not None:
+                break
         return datetime.strptime(ts, '%Y:%m:%d %H:%M:%S')
 
     def pil_image(self):
