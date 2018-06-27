@@ -8,11 +8,11 @@
 </head>
 
 <body>
-    <form id="fileform" method="post" enctype="multipart/form-data">
-        <input type="file" name="files[]" multiple />
-    </form>
+    <!-- <form id="fileform" method="post" enctype="multipart/form-data"> -->
+    <input id="files" type="file" name="files" multiple />
+    <!-- </form> -->
     <button onclick="UploadFiles()">Upload</button>
-    <progress></progress>
+    <div id="progresses"></div>
 </body>
     
 </html>
