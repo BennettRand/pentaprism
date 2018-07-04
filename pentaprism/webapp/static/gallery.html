@@ -1,31 +1,54 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Gallery</title>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+
+    <script src="/ui/scripts/util.js"></script>
     <script src="/ui/scripts/gallery.js"></script>
+
     <link rel="stylesheet" href="/ui/style/gallery.css">
 </head>
 
 <body>
-    <form id="picker" method="post" enctype="multipart/form-data">
-        Year <select name="year" onchange="FillMonth()">
-            <option>-</option>
-        </select>
-        Month <select name="month" onchange="FillDay()">
-            <option>-</option>
-        </select>
-        Day <select name="day" onchange="FillGallery()">
-            <option>-</option>
-        </select>
-    </form>
-    <div id="thumbnails"></div>
-    <div id="info">
-        <div id="viewer"></div>
-        <div id="exif"><dl></dl></div>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Pentaprism</a>
+        </nav>
+        <div class="row">
+            <form id="picker" class="form-inline">
+                <label for="year">Year</label>
+                <select name="year" class="form-control">
+                    <option>-</option>
+                </select>
+                <label for="year">Month</label>
+                <select name="month" class="form-control">
+                    <option>-</option>
+                </select>
+                <label for="year">Day</label>
+                <select name="day" class="form-control">
+                    <option>-</option>
+                </select>
+            </form>
+        </div>
+        <div class="row flex-row flex-nowrap" id="thumbnails">
+        </div>
+        <div class="row">
+            <div id="viewer"></div>
+        </div>
+        <div class="row">
+            <table class="table table-hover" id="exif">
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </body>
 
