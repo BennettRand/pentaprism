@@ -83,7 +83,10 @@ class Images(Base):
         return Image.fromarray(self.raw_img.postprocess())
 
     def b64_thumbnail(self, width=128):
-        pimg = self.pil_image()
+        pp = self.raw_img.postprocess(
+            half_size=True,
+            demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR)
+        pimg = Image.fromarray(pp)
         w, h = pimg.size
         scale = float(width) / float(w)
         height = scale * float(h)
@@ -106,17 +109,17 @@ class Images(Base):
     def save_file(self, base='./', force=False):
         directory = os.path.join(base, self.filepath)
         fpath = os.path.join(directory, self.filename)
-        
+
         if not os.path.exists(directory):
             os.makedirs(directory)
-        
+
         if os.path.isfile(fpath) and not force:
             return False
 
         with open(fpath, 'wb') as f:
             f.write(self.file.read())
             self.file.seek(0)
-        
+
         return True
 
     @classmethod

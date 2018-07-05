@@ -95,7 +95,7 @@ class ImageView(MethodView):
             if day is not None:
                 q = q.filter(extract('day', Images.timestamp) == day)
 
-            a = q.offset(offset).limit(limit).all()
+            a = q.order_by(Images.timestamp).offset(offset).limit(limit).all()
 
             ret = {i.id: {'name': i.filename,
                           'timestamp': i.timestamp.isoformat(), 
@@ -210,6 +210,18 @@ def dates():
 
     session.close()
     return jsonify(ret)
+
+
+@app.route('/exif/filter/<key>/<value>')
+def exif_filter(key, value):
+    return
+    # ret = None
+    # session = app.config['SESSION']()
+
+    # img = session.query(Images).filter
+
+    # session.close()
+    # return ret
 
 
 @app.route('/ui/<path:path>')
