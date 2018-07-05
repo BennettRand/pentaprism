@@ -97,9 +97,13 @@ class ImageView(MethodView):
 
             a = q.order_by(Images.timestamp).offset(offset).limit(limit).all()
 
-            ret = {i.id: {'name': i.filename,
-                          'timestamp': i.timestamp.isoformat(), 
-                          'url': '/images/{}/'.format(i.id)} for i in a}
+            ret = [{'id': i.id,
+                    'name': i.filename,
+                    'timestamp': i.timestamp.isoformat(), 
+                    'links': {'image': '/images/{}/'.format(i.id),
+                              'exif': '/images/{}/exif/'.format(i.id),
+                              'thumbnail': '/images/{}/thumbnail/'.format(i.id)}
+                    } for i in a]
             ret = jsonify(ret)
 
         else:

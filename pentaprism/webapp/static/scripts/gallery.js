@@ -45,32 +45,36 @@ function AddThumbnail(img) {
             .attr("src", data)
             .attr("class", "figure-img img-fluid rounded")
             .attr("alt", img.name)
-            .attr("onclick", `LoadImage("${img.url}")`)
+            .click(LoadImage(img))
         );
     };
 };
 
-function LoadImage(url) {
-    $("#viewer").empty();
-    $("#exif>tbody").empty();
-    
-    image = new Image();
-    image.src = url;
-    
-    $("#viewer").append(image);
-    $("#viewer>img").attr("class", "img-fluid");
-    
-    $.get(url + "exif/", function(data){
-        for (var key in data) {
-            $("#exif>tbody").append(
-                $("<tr>").append(
-                    $("<th>").attr("scope", "row").text(key)
-                ).append(
-                    $("<td>").text(data[key])
-                )
-            );
-        }
-    });
+function LoadImage(img) {
+    return function() {
+        $("#viewer")[0].loaded_img = img;
+        links = img.links;
+        $("#viewer").empty();
+        $("#exif>tbody").empty();
+        
+        image = new Image();
+        image.src = links.image;
+        
+        $("#viewer").append(image);
+        $("#viewer>img").attr("class", "img-fluid");
+        
+        $.get(links.exif, function(data){
+            for (var key in data) {
+                $("#exif>tbody").append(
+                    $("<tr>").append(
+                        $("<th>").attr("scope", "row").text(key)
+                    ).append(
+                        $("<td>").text(data[key])
+                    )
+                );
+            }
+        });
+    };
 }
 
 function FillGallery() {
@@ -113,6 +117,7 @@ function _fillGallery(year, month, day) {
     }, document.title, new_path);
 
     $.get(`/images/${query}`, (data) => {
+        $("#thumbnails")[0].gallery = data;
         $("#thumbnails").empty();
         for (var id in data) {
             img = data[id];
@@ -121,7 +126,7 @@ function _fillGallery(year, month, day) {
                     $("<figcaption>").attr("class", "figure-caption text-center").text(img.name)
                 )
             );
-            $.get(img.url + "thumbnail/", AddThumbnail(img));
+            $.get(img.links.thumbnail, AddThumbnail(img));
         }
     });
     // $("#viewer").attr("src", "");
