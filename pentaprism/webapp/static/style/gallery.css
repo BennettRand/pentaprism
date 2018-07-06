@@ -1,16 +1,50 @@
 #thumbnails {
-    /* height: 256px; */
     width: 100%; 
     overflow-x: auto;
-    /* white-space: nowrap; */
 }
 
 #thumbnails>figure {
-    /* display: inline-block; */
     padding: 2px;
 }
 
-/* dt { font-weight: 700; }
-dt:after { content: ":"; }
-dt, dt:after, dd { display: inline; }
-dd { margin: 0; } */
+#viewer {
+    position: relative;
+    width: 100%;
+}
+
+#viewer>img {
+    width: 100%;
+    height: auto;
+    z-index: 1;
+}
+
+#viewer>button {
+    position: absolute;
+    top: 50%;
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    /* border-radius: 5px; */
+    z-index: 0;
+    opacity: 0;
+    height: 100%;
+}
+
+#viewer>button:hover {
+    opacity: 0.5;
+}
+
+#viewer>.prev {
+    left: 0%;
+    transform: translate(0%, -50%);
+    -ms-transform: translate(0%, -50%);
+}
+
+#viewer>.next {
+    right: 0%;
+    transform: translate(0%, -50%);
+    -ms-transform: translate(0%, -50%);
+}
