@@ -41,10 +41,10 @@ function FillDay(fill = false) {
 
 function AddThumbnail(img) {
     return function (data) {
-        $(`#thumbnails>[name="${img.name}"]`).prepend(
+        $(`#thumbnails>[name="${img.name}"]`).append(
             $("<img>")
             .attr("src", data)
-            .attr("class", "figure-img img-fluid rounded")
+            .attr("class", "figure-img rounded")
             .attr("alt", img.name)
             .click(LoadImage(img, data))
         );

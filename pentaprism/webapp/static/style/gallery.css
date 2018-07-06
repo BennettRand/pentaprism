@@ -1,10 +1,17 @@
 #thumbnails {
     width: 100%; 
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 #thumbnails>figure {
-    padding: 2px;
+    margin: 2px;
+    width: 128px;
+    height: 110px;
+}
+
+#thumbnails img {
+    width: 128px;
 }
 
 #viewer {

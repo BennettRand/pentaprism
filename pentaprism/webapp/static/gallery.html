@@ -22,8 +22,7 @@
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="#">Pentaprism</a>
-        </nav>
-        <div class="row">
+            <ul class="navbar-nav mr-auto"></ul>
             <form id="picker" class="form-inline">
                 <label for="year">Year</label>
                 <select name="year" class="form-control">
@@ -38,11 +37,11 @@
                     <option>-</option>
                 </select>
             </form>
-        </div>
+        </nav>
         <div class="row flex-row flex-nowrap" id="thumbnails">
         </div>
         <div class="row">
-            <div id="viewer">
+            <div id="viewer" class="text-center">
                 <img />
                 <button class="prev">&laquo;</button>
                 <button class="next">&raquo;</button>
