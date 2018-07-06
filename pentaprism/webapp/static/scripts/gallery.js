@@ -1,4 +1,5 @@
 var dates = {};
+var LOADING_IMAGES = [];
 
 function FillYear(fill = false) {
     $('#picker>[name="year"]').empty();
@@ -62,20 +63,24 @@ function getAllEvents(element) {
 
 function LoadImage(img, data) {
     return function() {
+        if (LOADING_IMAGES.length > 0) {
+            return;
+        }
         $("#viewer")[0].loaded_img = img;
         links = img.links;
-        $("#viewer>img").remove();
         
         image = new Image();
+        LOADING_IMAGES.push(image);
         temp_image = new Image();
         
         temp_image.src = data;
         $(image).attr("class", "img-fluid");
         
-        $("#viewer").append(temp_image);
-        $(image).bind('load', function (e) {
-            $("#viewer").prepend(image);
-            temp_image.remove();
+        $("#viewer>img").replaceWith(temp_image);
+        $(image).on("load", function (e) {
+            console.log(e.currentTarget.src);
+            $("#viewer>img").replaceWith(e.currentTarget);
+            LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
         });
         
         image.src = links.image;
