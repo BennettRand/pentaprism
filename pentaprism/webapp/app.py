@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, Response, send_from_directory
 from flask.views import MethodView
 from flask_basicauth import BasicAuth
 from PIL.Image import LANCZOS
+from rawpy import DemosaicAlgorithm
 from sqlalchemy import extract
 
 from .models import Images, ExifData
@@ -117,12 +118,77 @@ class ImageView(MethodView):
             img.file = open(os.path.join(app.config['BASE_PATH'], img.filepath,
                                          img.filename), 'rb')
 
-            pimg = img.pil_image()
-            w, h = pimg.size
-
             width = request.args.get('width', None)
             height = request.args.get('height', None)
             fmt = request.args.get('format', 'JPEG')
+
+            pp_args = {}
+
+            if 'half-size' in request.args:
+                pp_args['half_size'] = request.args['half-size'] == 'true'
+            if 'wb' in request.args:
+                wb_mode = request.args['wb']
+                if wb_mode == 'camera':
+                    pp_args['use_camera_wb'] = True
+                elif wb_mode == 'auto':
+                    pp_args['use_auto_wb'] = True
+                else:
+                    wb_points = [float(p) for p in wb_mode.split(',')]
+                    pp_args['user_wb'] = wb_points
+
+            pp_args['demosaic_algorithm'] = {
+                'linear': DemosaicAlgorithm.LINEAR,
+                'vng': DemosaicAlgorithm.VNG,
+                'ppg': DemosaicAlgorithm.PPG,
+                'ahd': DemosaicAlgorithm.AHD,
+                'dcb': DemosaicAlgorithm.DCB,
+                # 'modified_ahd': DemosaicAlgorithm.MODIFIED_AHD,
+                # 'afd': DemosaicAlgorithm.AFD,
+                # 'vcd': DemosaicAlgorithm.VCD,
+                # 'vcd_modified_ahd': DemosaicAlgorithm.VCD_MODIFIED_AHD,
+                # 'lmmse': DemosaicAlgorithm.LMMSE,
+                # 'amaze': DemosaicAlgorithm.AMAZE,
+                'dht': DemosaicAlgorithm.DHT,
+                'aahd': DemosaicAlgorithm.AAHD,
+            }.get(request.args.get('demosaic', 'dht'),
+                  DemosaicAlgorithm.AMAZE)
+
+            if 'black' in request.args:
+                pp_args['user_black'] = int(request.args['black'])
+
+            if 'saturation' in request.args:
+                pp_args['user_sat'] = int(request.args['saturation'])
+
+            if 'no-auto-scale' in request.args:
+                pp_args['no_auto_scale'] = request.args['no-auto-scale'] == 'true'
+
+            if 'no-auto-bright' in request.args:
+                pp_args['no_auto_bright'] = request.args['no-auto-bright'] == 'true'
+
+            if 'auto-bright-thr' in request.args:
+                pp_args['auto_bright_thr'] = float(
+                    request.args['auto-bright-thr'])
+
+            if 'bright' in request.args:
+                pp_args['bright'] = float(request.args['bright'])
+
+            if 'exp' in request.args:
+                pp_args['exp_shift'] = float(request.args['exp'])
+
+            if 'exp-preserve' in request.args:
+                pp_args['exp_preserve_highlights'] = float(
+                    request.args['exp-preserve'])
+
+            if 'gamma' in request.args:
+                power, slope = request.args['gamma'].split(',')
+                pp_args['gamma'] = (float(power), float(slope))
+
+            # if 'chromatic-aberration' in request.args:
+            #     red_s, blue_s = request.args['chromatic-aberration'].split(',')
+            #     pp_args['chromatic_aberration'] = (float(red_s), float(blue_s))
+
+            pimg = img.pil_image(pp_args=pp_args)
+            w, h = pimg.size
 
             if width is None and height is None:
                 width = 1280

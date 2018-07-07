@@ -79,14 +79,13 @@ class Images(Base):
                 break
         return datetime.strptime(ts, '%Y:%m:%d %H:%M:%S')
 
-    def pil_image(self):
-        return Image.fromarray(self.raw_img.postprocess())
+    def pil_image(self, pp_args={}):
+        return Image.fromarray(self.raw_img.postprocess(**pp_args))
 
     def b64_thumbnail(self, width=128):
-        pp = self.raw_img.postprocess(
-            half_size=True,
-            demosaic_algorithm=rawpy.DemosaicAlgorithm.LINEAR)
-        pimg = Image.fromarray(pp)
+        pimg = self.pil_image(pp_args={
+            'half_size': True,
+            'demosaic_algorithm': rawpy.DemosaicAlgorithm.LINEAR})
         w, h = pimg.size
         scale = float(width) / float(w)
         height = scale * float(h)
