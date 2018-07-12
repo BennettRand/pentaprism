@@ -9,6 +9,7 @@ from rawpy import DemosaicAlgorithm
 from sqlalchemy import extract
 
 from .models import Images, ExifData
+from ..color import wb_to_mul
 
 app = Flask(__name__)
 
@@ -133,8 +134,8 @@ class ImageView(MethodView):
                 elif wb_mode == 'auto':
                     pp_args['use_auto_wb'] = True
                 else:
-                    wb_points = [float(p) for p in wb_mode.split(',')]
-                    pp_args['user_wb'] = wb_points
+                    t, g, e = [float(p) for p in wb_mode.split(',')]
+                    pp_args['user_wb'] = wb_to_mul(t, g, e)
 
             pp_args['demosaic_algorithm'] = {
                 'linear': DemosaicAlgorithm.LINEAR,
