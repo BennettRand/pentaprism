@@ -123,6 +123,7 @@ class ImageView(MethodView):
             crop = request.args.get('crop', None)
             rot = request.args.get('rotate', None)
             fmt = request.args.get('format', 'JPEG')
+            grid = request.args.get('grid', '')
             no_cr = request.args.get('no-cr', 'false') == 'true'
 
             pp_args = {}
@@ -198,13 +199,18 @@ class ImageView(MethodView):
                 width = 1280
 
             if crop is not None:
-                crop = tuple([int(x) for x in crop.split(',')])
+                crop = tuple([float(x) for x in crop.split(',')])
 
             pimg = img.pil_image(pp_args=pp_args, watermark=watermark,
                                  width=width, height=height, crop=crop,
                                  rotate=rot)
 
-            pimg = Images.draw_triangles2(pimg)
+            if grid == 'thirds':
+                pimg = Images.draw_thirds(pimg, 3)
+            elif grid == 'triangles1':
+                pimg = Images.draw_triangles1(pimg, 3)
+            elif grid == 'triangles2':
+                pimg = Images.draw_triangles2(pimg, 3)
 
             buff = cStringIO.StringIO()
             pimg.save(buff, format=fmt)

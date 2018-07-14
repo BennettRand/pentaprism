@@ -118,7 +118,12 @@ class Images(Base):
             img = img.rotate(float(rotate)).crop(crop_)
 
         if crop is not None:
-            img = img.crop(crop)
+            w, h = img.size
+            l = (crop[0] / 100.0) * w
+            t = (crop[1] / 100.0) * h
+            r = (crop[2] / 100.0) * w
+            b = (crop[3] / 100.0) * h
+            img = img.crop((l, t, r, b))
 
         if width is not None or height is not None:
             w, h = img.size
