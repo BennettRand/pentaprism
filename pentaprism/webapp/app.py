@@ -4,7 +4,6 @@ import os.path
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask.views import MethodView
 from flask_basicauth import BasicAuth
-from PIL.Image import LANCZOS
 from rawpy import DemosaicAlgorithm
 from sqlalchemy import extract
 
@@ -121,7 +120,10 @@ class ImageView(MethodView):
 
             width = request.args.get('width', None)
             height = request.args.get('height', None)
+            crop = request.args.get('crop', None)
+            rot = request.args.get('rotate', None)
             fmt = request.args.get('format', 'JPEG')
+            no_cr = request.args.get('no-cr', 'false') == 'true'
 
             pp_args = {}
 
@@ -188,23 +190,22 @@ class ImageView(MethodView):
             #     red_s, blue_s = request.args['chromatic-aberration'].split(',')
             #     pp_args['chromatic_aberration'] = (float(red_s), float(blue_s))
 
-            pimg = img.pil_image(pp_args=pp_args)
-            w, h = pimg.size
+            watermark = None
+            if not no_cr:
+                watermark = img.get_copyright()
 
             if width is None and height is None:
                 width = 1280
 
-            if width is None:
-                scale = float(height) / float(h)
-                width = scale * float(w)
+            if crop is not None:
+                crop = tuple([int(x) for x in crop.split(',')])
 
-            if height is None:
-                scale = float(width) / float(w)
-                height = scale * float(h)
+            pimg = img.pil_image(pp_args=pp_args, watermark=watermark,
+                                 width=width, height=height, crop=crop,
+                                 rotate=rot)
 
-            height = int(height)
-            width = int(width)
-            pimg = pimg.resize((width, height), LANCZOS)
+            pimg = Images.draw_triangles2(pimg)
+
             buff = cStringIO.StringIO()
             pimg.save(buff, format=fmt)
 
@@ -293,6 +294,30 @@ def exif_filter(key, value):
 
     # session.close()
     # return ret
+
+
+@app.route('/images/<int:img_id>/size/', methods=['GET'])
+def size_of_img(img_id):
+    session = app.config['SESSION']()
+    img = session.query(Images).get(img_id)
+    if img is None:
+        ret = jsonify(error='Not found', id=img_id)
+        ret.status_code = 404
+        return ret
+
+    img._im = None
+    img.file = open(os.path.join(app.config['BASE_PATH'], img.filepath,
+                                 img.filename), 'rb')
+
+    pimg = img.pil_image(pp_args={
+        'half_size': True,
+        'demosaic_algorithm': DemosaicAlgorithm.LINEAR})
+
+    width, height = pimg.size
+
+    return jsonify(width=width * 2, height=height * 2)
+
+    session.close()
 
 
 @app.route('/ui/<path:path>')

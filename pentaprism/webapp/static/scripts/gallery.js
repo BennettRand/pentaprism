@@ -83,7 +83,7 @@ function LoadImage(img, data) {
             LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
         });
         
-        image.src = links.image;
+        image.src = links.image + "?half-size=true&wb=camera";
         
         $.get(links.exif, function(data){
             $("#exif>tbody").empty();

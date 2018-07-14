@@ -1,18 +1,23 @@
 import base64
 import cStringIO
+import math
 import os
 import os.path
 from datetime import datetime
 
 import exifread
 import rawpy
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
+from PIL.Image import LANCZOS
 from sqlalchemy import (Column, Integer, String, DateTime, ForeignKey, Text,
                         UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
+
+def sec(x): return 1.0 / math.cos(x)
 
 
 class BadImageException(Exception):
@@ -32,7 +37,8 @@ class Images(Base):
                              back_populates="image",
                              cascade="all, delete-orphan")
     exif = relationship("ExifData", uselist=True,
-                        back_populates="image", cascade="all,delete-orphan")
+                        back_populates="image", cascade="all,delete-orphan",
+                        lazy='dynamic')
 
     def __init__(self, fileobj, filename=None):
         self.file = fileobj
@@ -79,18 +85,75 @@ class Images(Base):
                 break
         return datetime.strptime(ts, '%Y:%m:%d %H:%M:%S')
 
-    def pil_image(self, pp_args={}):
-        return Image.fromarray(self.raw_img.postprocess(**pp_args))
+    def get_copyright(self):
+        ks = ['Image Copyright', 'Image Artist']
+        cr = self.exif.filter(ExifData.key.in_(ks)).first()
+        if cr is None:
+            cr = "Copyright"
+        else:
+            cr = cr.value
+        return '{} {}'.format(cr, self.timestamp.year)
+
+    def pil_image(self, pp_args={}, watermark=None, width=None, height=None,
+                  crop=None, rotate=None):
+        img = Image.fromarray(self.raw_img.postprocess(**pp_args))
+
+        if rotate is not None:
+            A = float(rotate)
+            A = math.fabs(math.radians(A))
+            B = (math.pi / 2.0) - A
+            c = math.cos(A)
+            s = math.sin(A)
+            w, h = img.size
+
+            shr = max(w, h) / (sec(A) + sec(B))
+            new_w = (h * s + w * c)
+            new_h = (h * c + w * s)
+
+            d_w = shr - ((new_w - w) / 2.0)
+            d_h = shr - ((new_h - h) / 2.0)
+
+            crop_ = (int(d_w), int(d_h), int(w - d_w), int(h - d_h))
+
+            img = img.rotate(float(rotate)).crop(crop_)
+
+        if crop is not None:
+            img = img.crop(crop)
+
+        if width is not None or height is not None:
+            w, h = img.size
+            if width is None:
+                scale = float(height) / float(h)
+                width = scale * float(w)
+
+            if height is None:
+                scale = float(width) / float(w)
+                height = scale * float(h)
+
+            height = int(height)
+            width = int(width)
+            img = img.resize((width, height), LANCZOS)
+
+        if watermark is not None:
+            mark = Image.new("RGBA", img.size)
+            draw = ImageDraw.ImageDraw(mark, "RGBA")
+            font = ImageFont.truetype(
+                './pentaprism/webapp/static/style/Comfortaa-Regular.ttf', 24)
+            fs = font.getsize(watermark)
+            dx, dy = (img.size[0] - fs[0]) - 10, (img.size[1] - fs[1]) - 10
+            draw.text((dx, dy), watermark, font=font)
+            mask = mark.convert("L").point(lambda x: min(x, 100))
+            mark.putalpha(mask)
+            img.paste(mark, None, mark)
+
+        return img
 
     def b64_thumbnail(self, width=128):
         pimg = self.pil_image(pp_args={
             'half_size': True,
-            'demosaic_algorithm': rawpy.DemosaicAlgorithm.LINEAR})
-        w, h = pimg.size
-        scale = float(width) / float(w)
-        height = scale * float(h)
+            'demosaic_algorithm': rawpy.DemosaicAlgorithm.LINEAR},
+            width=width)
 
-        pimg.thumbnail((width, height))
         buff = cStringIO.StringIO()
         pimg.save(buff, format="JPEG")
         return base64.b64encode(buff.getvalue())
@@ -163,6 +226,70 @@ class Images(Base):
                 raise AttributeError()
         except AttributeError:
             return os.path.basename(fileobj.filename)
+
+    @staticmethod
+    def draw_thirds(img, weight=1):
+        w, h = img.size
+        draw = ImageDraw.Draw(img)
+
+        t_w = w / 3
+        t_h = h / 3
+
+        l = ((t_w, 0), (t_w, h))
+        r = ((2 * t_w, 0), (2 * t_w, h))
+        t = ((0, t_h), (w, t_h))
+        b = ((0, 2 * t_h), (w, 2 * t_h))
+
+        draw.line(l, '#000', weight)
+        draw.line(r, '#000', weight)
+        draw.line(t, '#000', weight)
+        draw.line(b, '#000', weight)
+
+        return img
+
+    @staticmethod
+    def draw_triangles1(img, weight=1):
+        w, h = img.size
+        diag = math.sqrt(w ** 2 + h ** 2)
+        alt = (w * h) / diag
+        d2 = int(math.cos(math.atan(float(h) / float(w))) * w)
+        d1 = diag - d2
+        l = d1 * alt / h
+        b = d2 * alt / w
+
+        draw = ImageDraw.Draw(img)
+
+        d0 = ((0, 0), (w, h))
+        d1 = ((0, h), (l, h - b))
+        d2 = ((w, 0), (w - l, b))
+
+        draw.line(d0, '#000', weight)
+        draw.line(d1, '#000', weight)
+        draw.line(d2, '#000', weight)
+
+        return img
+
+    @staticmethod
+    def draw_triangles2(img, weight=1):
+        w, h = img.size
+        diag = math.sqrt(w ** 2 + h ** 2)
+        alt = (w * h) / diag
+        d2 = int(math.cos(math.atan(float(h) / float(w))) * w)
+        d1 = diag - d2
+        l = d1 * alt / h
+        b = d2 * alt / w
+
+        draw = ImageDraw.Draw(img)
+
+        d0 = ((0, h), (w, 0))
+        d1 = ((0, 0), (l, b))
+        d2 = ((w, h), (w - l, h - b))
+
+        draw.line(d0, '#000', weight)
+        draw.line(d1, '#000', weight)
+        draw.line(d2, '#000', weight)
+
+        return img
 
 
 class Thumbnails(Base):
