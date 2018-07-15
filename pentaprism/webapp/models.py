@@ -142,10 +142,14 @@ class Images(Base):
         if watermark is not None:
             mark = Image.new("RGBA", img.size)
             draw = ImageDraw.ImageDraw(mark, "RGBA")
+            weight = img.size[0] / 40
+            offset = weight / 3
             font = ImageFont.truetype(
-                './pentaprism/webapp/static/style/Comfortaa-Regular.ttf', 24)
+                './pentaprism/webapp/static/style/Comfortaa-Regular.ttf',
+                weight)
             fs = font.getsize(watermark)
-            dx, dy = (img.size[0] - fs[0]) - 10, (img.size[1] - fs[1]) - 10
+            dx = (img.size[0] - fs[0]) - offset
+            dy = (img.size[1] - fs[1]) - offset
             draw.text((dx, dy), watermark, font=font)
             mask = mark.convert("L").point(lambda x: min(x, 100))
             mark.putalpha(mask)

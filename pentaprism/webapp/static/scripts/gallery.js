@@ -76,10 +76,12 @@ function LoadImage(img, data) {
         temp_image.src = data;
         $(image).attr("class", "img-fluid");
         
-        $("#viewer>img").replaceWith(temp_image);
+        $("#viewer>a>img").replaceWith(temp_image);
+        $("#viewer>a").attr("href", `/ui/editor.html?id=${img.id}`);
+        
         $(image).on("load", function (e) {
             console.log(e.currentTarget.src);
-            $("#viewer>img").replaceWith(e.currentTarget);
+            $("#viewer>a>img").replaceWith(e.currentTarget);
             LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
         });
         

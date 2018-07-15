@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Editor</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/bootstrap-slider.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/css/bootstrap-slider.min.css">
+
+    <script src="/ui/scripts/util.js"></script>
+    <script src="/ui/scripts/editor.js"></script>
+
+    <link rel="stylesheet" href="/ui/style/gallery.css">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Pentaprism</a>
+            <ul class="navbar-nav mr-auto"></ul>
+        </nav>
+        <div class="row">
+            <div id="viewer" class="text-center">
+                <img />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">White Balance</label>
+            <div class="col">
+                <label for="wb">Mode</label>
+                <select name="wb" class="form-control">
+                    <option value="" selected>None</option>
+                    <option value="auto">Auto</option>
+                    <option value="camera">Camera</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Size &amp; Orientation</label>
+            <div class="col">
+                <input id="width" type="text" value="" class="form-control"/>
+                <label for="width">Width</label>
+            </div>
+            <div class="col">
+                <input id="height" type="text" value="" class="form-control"/>
+                <label for="height">Height</label>
+            </div>
+            <div class="col">
+                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-45" data-slider-max="45" data-slider-step="0.1" data-slider-value="0" />
+                <label for="rot">Rotation</label>
+            </div>
+        </div><div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Crop</label>
+            <div class="col">
+                <input id="left" type="text" value="" class="form-control" />
+                <label for="left">Left</label>
+            </div>
+            <div class="col">
+                <input id="top" type="text" value="" class="form-control" />
+                <label for="top">Top</label>
+            </div>
+            <div class="col">
+                <input id="right" type="text" value="" class="form-control" />
+                <label for="right">Right</label>
+            </div>
+            <div class="col">
+                <input id="bottom" type="text" value="" class="form-control" />
+                <label for="bottom">Bottom</label>
+            </div>
+            <div class="col">
+                <button onclick="ClearCrop()">Clear</button>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Options</label>
+            <div class="col">
+                <label for="format">Format</label>
+                <select name="format" class="form-control">
+                    <option value="" selected></option>
+                    <option value="BMP">Bitmap</option>
+                    <option value="GIF">GIF</option>
+                    <option value="JPEG">JPEG</option>
+                    <option value="PNG">PNG</option>
+                    <option value="WEBP">WebP</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="grid">Grid</label>
+                <select name="grid" class="form-control">
+                    <option value="" selected></option>
+                    <option value="thirds">Rule of Thirds</option>
+                    <option value="triangles1">Rule of Triangles</option>
+                    <option value="triangles2">Rule of Triangles 2</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="cr">Copyright</label>
+                <input class="form-control" id="cr" type="checkbox" checked/>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
