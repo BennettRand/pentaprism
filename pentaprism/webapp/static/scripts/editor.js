@@ -11,10 +11,12 @@ function LoadImage(img_id, args) {
         LOADING_IMAGES.push(image);
 
         $(image).attr("class", "img-fluid");
+        $("#viewer>.loading").show();
         
         $(image).on("load", function (e) {
             console.log(e.currentTarget.src);
             $("#viewer>img").replaceWith(e.currentTarget);
+            $("#viewer>.loading").hide();
             LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
         });
         

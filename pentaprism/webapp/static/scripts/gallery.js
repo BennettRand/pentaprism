@@ -77,12 +77,14 @@ function LoadImage(img, data) {
         $(image).attr("class", "img-fluid");
         
         $("#viewer>a>img").replaceWith(temp_image);
+        $("#viewer>.loading").show();
         $("#viewer>a").attr("href", `/ui/editor.html?id=${img.id}`);
         
         $(image).on("load", function (e) {
             console.log(e.currentTarget.src);
             $("#viewer>a>img").replaceWith(e.currentTarget);
             LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
+            $("#viewer>.loading").hide();
         });
         
         image.src = links.image + "?half-size=true&wb=camera";
