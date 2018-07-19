@@ -126,7 +126,7 @@ class ImageView(MethodView):
             grid = request.args.get('grid', '')
             no_cr = request.args.get('no-cr', 'false') == 'true'
 
-            pp_args = {}
+            pp_args = {'auto_bright_thr': 0.00003}
 
             if 'half-size' in request.args:
                 pp_args['half_size'] = request.args['half-size'] == 'true'
@@ -155,7 +155,7 @@ class ImageView(MethodView):
                 'dht': DemosaicAlgorithm.DHT,
                 'aahd': DemosaicAlgorithm.AAHD,
             }.get(request.args.get('demosaic', 'dht'),
-                  DemosaicAlgorithm.AMAZE)
+                  DemosaicAlgorithm.DHT)
 
             if 'black' in request.args:
                 pp_args['user_black'] = int(request.args['black'])

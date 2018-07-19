@@ -29,6 +29,24 @@
         <div class="row">
             <div id="viewer" class="text-center">
                 <img />
+                <div class="guides">
+                    <svg class="thirds" width="100%" height="100%">
+                        <line x1="33.333%" y1="0" x2="33.333%" y2="100%" />
+                        <line x1="66.667%" y1="0" x2="66.667%" y2="100%" />
+                        <line x1="0" y1="33.333%" x2="100%" y2="33.333%" />
+                        <line x1="0" y1="66.667%" x2="100%" y2="66.667%" />
+                    </svg>
+                    <svg class="triangles1" width="100%" height="100%">
+                        <line x1="0" y1="0" x2="100%" y2="100%" />
+                        <line class="left" x1="0" y1="100%" x2="0" y2="0" />
+                        <line class="right"x1="100%" y1="0" x2="0" y2="0" />
+                    </svg>
+                    <svg class="triangles2" width="100%" height="100%">
+                        <line x1="0" y1="100%" x2="100%" y2="0" />
+                        <line class="left" x1="0" y1="0" x2="0" y2="0" />
+                        <line class="right"x1="100%" y1="100%" x2="0" y2="0" />
+                    </svg>
+                </div>
                 <div class="loading"><h1>Loading</h1></div>
             </div>
         </div>
@@ -54,10 +72,12 @@
                 <label for="height">Height</label>
             </div>
             <div class="col">
-                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-45" data-slider-max="45" data-slider-step="0.1" data-slider-value="0" />
+                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-45" data-slider-max="45" data-slider-step="0.5" data-slider-value="0" />
+                <span id="rotlabel">0</span>
                 <label for="rot">Rotation</label>
             </div>
-        </div><div class="form-group row">
+        </div>
+        <div class="form-group row">
             <label for="colFormLabel" class="col-sm-2 col-form-label">Crop</label>
             <div class="col">
                 <input id="left" type="text" value="" class="form-control" />
@@ -104,6 +124,78 @@
             <div class="col">
                 <label for="cr">Copyright</label>
                 <input class="form-control" id="cr" type="checkbox" checked/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Advanced</label>
+            <div class="col">
+                <input id="black" type="text" value="" class="form-control" />
+                <label for="black">Black</label>
+            </div>
+            <div class="col">
+                <input id="sat" type="text" value="" class="form-control" />
+                <label for="sat">Saturation</label>
+            </div>
+            <div class="col">
+                <input id="bright" type="text" value="" class="form-control" />
+                <label for="bright">Brightness</label>
+            </div>
+            <div class="col">
+                <input id="exp" class="form-control" data-slider-id='expSlider' type="text" data-slider-min="0.25" data-slider-max="8" data-slider-step="0.25" data-slider-value="1" >
+                <span id="explabel">1</span>
+                <label for="exp">Exposure</label>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Advanced 2</label>
+            <div class="col">
+                <label for="demosaic">Demosaic Algorithm</label>
+                <select name="demosaic" class="form-control">
+                    <option value="" selected></option>
+                    <option value="linear">Linear</option>
+                    <option value="vng">VNG</option>
+                    <option value="ppg">PPG</option>
+                    <option value="ahd">AHD</option>
+                    <option value="dcb">DCB</option>
+                    <option value="dht">DHT</option>
+                    <option value="aahd">AAHD</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="half">Half Size</label>
+                <input class="form-control" id="half" type="checkbox" />
+            </div>
+            <div class="col">
+                <label for="nautoscale">No Auto Scale</label>
+                <input class="form-control" id="nautoscale" type="checkbox" />
+            </div>
+            <div class="col">
+                <label for="nautobright">No Auto Brightness</label>
+                <input class="form-control" id="nautobright" type="checkbox" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Advanced 3</label>
+            <div class="col">
+                <input id="abthr" class="form-control" data-slider-id='powSlider' type="text" data-slider-min="0.00003" data-slider-max="0.1" data-slider-step="0.00001" data-slider-value="0.00003" />
+                <span id="abthrlabel">0.00003</span>
+                <label for="abthr">Auto Brightness Threshold</label>
+            </div>
+            <div class="col">
+                <input id="exppre" class="form-control" data-slider-id='powSlider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0" />
+                <span id="expprelabel">0</span>
+                <label for="exppre">Exposure Preserve Highlights</label>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-sm-2 col-form-label">Gamma</label>
+            <div class="col">
+                <input id="gpower" class="form-control" data-slider-id='powSlider' type="text" data-slider-min="0.4" data-slider-max="100" data-slider-step="0.1" data-slider-value="2.2" />
+                <span id="gpowlabel">2.2</span>
+                <label for="gpower">Gamma Power</label>
+                <input id="gslope" class="form-control" data-slider-id='slopeSlider' type="text" data-slider-min="1" data-slider-max="100" data-slider-step="0.5" data-slider-value="4.5" />
+                <span id="gslplabel">4.5</span>
+                <label for="gslope">Gamma Slope</label>
             </div>
         </div>
     </div>
