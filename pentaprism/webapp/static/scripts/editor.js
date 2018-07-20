@@ -53,7 +53,7 @@ function EnforceCropRules() {
     return [l, t, r, b];
 }
 
-function MakeArgsFromForm() {
+function MakeArgsFromForm(full=false) {
     
     abthr = $("#abthr").val();
     black = $("#black").val();
@@ -86,7 +86,7 @@ function MakeArgsFromForm() {
     if (demosaic != "") { args.demosaic = demosaic;}
     if (exp != "1" && exp != "") { args.exp = exp;}
     if (format != "") {args.format = format;}
-    if (grid != "") {args.grid = grid;}
+    // if (grid != "") {args.grid = grid;}
     if ((gp != "2.2" || gs != "4.5") && gp != "" && gs != "") {args.gamma = `${gp},${gs}`;}
     if (h != "") {args.height = h;}
     if (half) {args["half-size"] = "true";}
@@ -110,8 +110,8 @@ function ReloadOnChange() {
 }
 
 function RecalcTriangles(image) {
-    w = image.clientWidth;
-    h = image.clientHeight;
+    w = image.parentElement.clientWidth;
+    h = image.parentElement.clientHeight;
     diag = Math.sqrt(w * w + h * h);
     alt = (w * h) / diag
     d2 = Math.cos(Math.atan(h / w)) * w
@@ -133,6 +133,14 @@ function RecalcTriangles(image) {
     $('.triangles2>line.right').attr('y2', left);
 }
 
+function SwitchGrid(e) {
+    grid = e.currentTarget.value;
+    $(".thirds,.triangles1,.triangles2").hide();
+    if (grid != '') {
+        $(`.${grid}`).show();
+    }
+}
+
 function ClearCrop() {
     $("#left,#top,#right,#bottom").val("");
     ReloadOnChange();
@@ -141,12 +149,25 @@ function ClearCrop() {
 $(document).ready(() => {
     ReloadOnChange();
     changable = ["select[name=wb]", "#width", "#height", "#left", "#right",
-        "#top", "#bottom", "select[name=format]", "#cr", "select[name=grid]",
+        "#top", "#bottom", "select[name=format]", "#cr", 
         "#black", "#bright", "#sat", "select[name=demosaic]", "#half",
         "#nautoscale", "#nautobright"];
     $(changable.join(",")).change(ReloadOnChange);
-    $('#rot').slider({tooltip: 'hide'}).on('slideStop', ReloadOnChange).on("slide", function (e) {
+    $("select[name=grid]").change(SwitchGrid);
+    $('#rot').slider({ tooltip: 'hide' }).on("slide", function (e) {
         $("#rotlabel").text(e.value);
+        w = $('#viewer>img')[0].clientWidth;
+        h = $('#viewer>img')[0].clientHeight;
+        rad = parseFloat(e.value) * (Math.PI / 180);
+        rot = Math.abs(rad);
+        c = Math.cos(rot);
+        s = Math.sin(rot);
+        d = Math.sqrt(w * w + h * h);
+        new_w = (h * s + w * c) / w;
+        new_h = (h * c + w * s) / h;
+        scale = Math.max(new_w, new_h);
+        console.log(scale);
+        $('#viewer>img').attr('style', `transform: rotate(${rad}rad) scale(${scale}, ${scale});`);
     });
     $('#gpower').slider({ tooltip: 'hide' }).on('slideStop', ReloadOnChange).on("slide", function (e) {
         $("#gpowlabel").text(e.value);
@@ -163,4 +184,5 @@ $(document).ready(() => {
     $('#exp').slider({ tooltip: 'hide' }).on('slideStop', ReloadOnChange).on("slide", function (e) {
         $("#explabel").text(e.value);
     });
+    $(".thirds,.triangles1,.triangles2").hide();
 });

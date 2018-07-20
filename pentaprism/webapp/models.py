@@ -101,21 +101,21 @@ class Images(Base):
         if rotate is not None:
             A = float(rotate)
             A = math.fabs(math.radians(A))
-            B = (math.pi / 2.0) - A
             c = math.cos(A)
             s = math.sin(A)
             w, h = img.size
 
-            shr = max(w, h) / (sec(A) + sec(B))
             new_w = (h * s + w * c)
             new_h = (h * c + w * s)
 
-            d_w = shr - ((new_w - w) / 2.0)
-            d_h = shr - ((new_h - h) / 2.0)
+            scale = min(w / new_w, h / new_h)
+
+            d_w = ((w * (1 - scale)) / 2.0)
+            d_h = ((h * (1 - scale)) / 2.0)
 
             crop_ = (int(d_w), int(d_h), int(w - d_w), int(h - d_h))
 
-            img = img.rotate(float(rotate)).crop(crop_)
+            img = img.rotate(-float(rotate)).crop(crop_)
 
         if crop is not None:
             w, h = img.size
