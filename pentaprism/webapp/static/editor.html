@@ -28,7 +28,8 @@
         </nav>
         <div class="row">
             <div id="viewer" class="text-center">
-                <img />
+                <img class="storage" />
+                <canvas id="image-container"></canvas>
                 <div class="guides">
                     <svg class="thirds" width="100%" height="100%">
                         <line x1="33.333%" y1="0" x2="33.333%" y2="100%" />
@@ -72,7 +73,7 @@
                 <label for="height">Height</label>
             </div>
             <div class="col">
-                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-45" data-slider-max="45" data-slider-step="0.5" data-slider-value="0" />
+                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-10" data-slider-max="10" data-slider-step="0.1" data-slider-value="0" />
                 <span id="rotlabel">0</span>
                 <label for="rot">Rotation</label>
             </div>

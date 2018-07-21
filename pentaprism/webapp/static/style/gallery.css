@@ -29,6 +29,17 @@
     z-index: 1;
 }
 
+#viewer img.storage {
+    display: none;
+}
+
+#viewer canvas {
+    display: block;
+    width: 100%;
+    /* height: auto; */
+    z-index: 1;
+}
+
 #viewer>button {
     position: absolute;
     top: 50%;
@@ -87,8 +98,8 @@
 }
 
 #viewer>.guides>svg>line {
-    stroke: black;
-    stroke-width: 3;
+    stroke: green;
+    stroke-width: 5;
     stroke-dasharray: 1;
 }
 

@@ -10,19 +10,53 @@ function LoadImage(img_id, args) {
         image = new Image();
         LOADING_IMAGES.push(image);
 
-        $(image).attr("class", "img-fluid");
+        $(image).attr("class", "storage");
         $("#viewer>.loading").show();
         
         $(image).on("load", function (e) {
             console.log(e.currentTarget.src);
             $("#viewer>img").replaceWith(e.currentTarget);
-            RecalcTriangles(e.currentTarget);
+            DrawImageOnCanvas(image, $("#rot").val(), EnforceCropRules());
             $("#viewer>.loading").hide();
             LOADING_IMAGES.splice(LOADING_IMAGES.indexOf(e.currentTarget), 1);
         });
         
         image.src = `/images/${img_id}/?${args}`;
     };
+}
+
+function DrawImageOnCanvas(image, deg, crop) {
+    canvas = $("#image-container")[0];
+    ctx = canvas.getContext("2d");
+    
+    l = crop[0];
+    t = crop[1];
+    r = crop[2];
+    b = crop[3];
+    
+    canvas.width = image.width * ((r - l) / 100);
+    canvas.height = image.height * ((b - t) / 100);
+    sx = (l / 100) * image.width;
+    sy = (t / 100) * image.height;
+    w = canvas.width;
+    h = canvas.height;
+    rad = parseFloat(deg) * (Math.PI / 180);
+    rot = Math.abs(rad);
+    c = Math.cos(rot);
+    s = Math.sin(rot);
+    d = Math.sqrt(w * w + h * h);
+    new_w = (h * s + w * c) / w;
+    new_h = (h * c + w * s) / h;
+    scale = Math.max(new_w, new_h);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(rad);
+    ctx.scale(scale, scale);
+    ctx.drawImage(image, sx, sy, canvas.width, canvas.height, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+    ctx.restore();
+    RecalcTriangles(canvas);
 }
 
 function EnforceCropRules() {
@@ -32,7 +66,7 @@ function EnforceCropRules() {
     b = parseFloat($("#bottom").val());
 
     if (isNaN(l) && isNaN(t) && isNaN(r) && isNaN(b)) {
-        return;
+        return [0,0,100,100];
     }
 
     if (isNaN(l)) { l = 0; }
@@ -82,7 +116,7 @@ function MakeArgsFromForm(full=false) {
     if (black != "") {args.black = black;}
     if (bright != "") { args.bright = bright;}
     if (!cr) {args["no-cr"] = "true";}
-    if (crop != undefined) {args.crop = crop.join(',');}
+    if (full && crop != undefined) {args.crop = crop.join(',');}
     if (demosaic != "") { args.demosaic = demosaic;}
     if (exp != "1" && exp != "") { args.exp = exp;}
     if (format != "") {args.format = format;}
@@ -92,7 +126,7 @@ function MakeArgsFromForm(full=false) {
     if (half) {args["half-size"] = "true";}
     if (nab) {args["no-auto-bright"] = "true";}
     if (nas) {args["no-auto-scale"] = "true";}
-    if (rot != "0" && rot != "") {args.rotate = rot;}
+    if (full && rot != "0" && rot != "") {args.rotate = rot;}
     if (sat != "") { args.saturation = sat;}
     if (w != "") {args.width = w;}
     if (wb != "") {args.wb = wb;}
@@ -107,6 +141,11 @@ function MakeArgsFromForm(full=false) {
 
 function ReloadOnChange() {
     LoadImage(ParseArgs().id, MakeArgsFromForm())();
+}
+
+function RotateImage(deg) {
+
+    // $('#viewer>canvas').attr('style', `transform: rotate(${rad}rad) scale(${scale}, ${scale});`);
 }
 
 function RecalcTriangles(image) {
@@ -143,31 +182,22 @@ function SwitchGrid(e) {
 
 function ClearCrop() {
     $("#left,#top,#right,#bottom").val("");
-    ReloadOnChange();
+    DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
 }
 
 $(document).ready(() => {
     ReloadOnChange();
-    changable = ["select[name=wb]", "#width", "#height", "#left", "#right",
-        "#top", "#bottom", "select[name=format]", "#cr", 
+    changable = ["select[name=wb]", "#width", "#height", "select[name=format]", "#cr", 
         "#black", "#bright", "#sat", "select[name=demosaic]", "#half",
         "#nautoscale", "#nautobright"];
     $(changable.join(",")).change(ReloadOnChange);
     $("select[name=grid]").change(SwitchGrid);
+    $("#left,#right,#top,#bottom").change(function () {
+        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules())
+    })
     $('#rot').slider({ tooltip: 'hide' }).on("slide", function (e) {
         $("#rotlabel").text(e.value);
-        w = $('#viewer>img')[0].clientWidth;
-        h = $('#viewer>img')[0].clientHeight;
-        rad = parseFloat(e.value) * (Math.PI / 180);
-        rot = Math.abs(rad);
-        c = Math.cos(rot);
-        s = Math.sin(rot);
-        d = Math.sqrt(w * w + h * h);
-        new_w = (h * s + w * c) / w;
-        new_h = (h * c + w * s) / h;
-        scale = Math.max(new_w, new_h);
-        console.log(scale);
-        $('#viewer>img').attr('style', `transform: rotate(${rad}rad) scale(${scale}, ${scale});`);
+        DrawImageOnCanvas($("#viewer>img")[0], e.value, EnforceCropRules());
     });
     $('#gpower').slider({ tooltip: 'hide' }).on('slideStop', ReloadOnChange).on("slide", function (e) {
         $("#gpowlabel").text(e.value);
