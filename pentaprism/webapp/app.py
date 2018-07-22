@@ -121,10 +121,11 @@ class ImageView(MethodView):
             width = request.args.get('width', None)
             height = request.args.get('height', None)
             crop = request.args.get('crop', None)
-            rot = request.args.get('rotate', None)
+            rot = request.args.get('rotate', 0)
             fmt = request.args.get('format', 'JPEG')
             grid = request.args.get('grid', '')
             no_cr = request.args.get('no-cr', 'false') == 'true'
+            full_render = request.args.get('full', None) == 'true'
 
             pp_args = {'auto_bright_thr': 0.00003}
 
@@ -217,6 +218,11 @@ class ImageView(MethodView):
 
             ret = Response(buff.getvalue(), status=200,
                            mimetype='image/{}'.format(fmt.lower()))
+
+            if full_render:
+                cd = 'attachment; filename="{}.{}"'.format(
+                    img.filename, fmt.lower())
+                ret.headers['Content-Disposition'] = cd
 
         session.close()
         return ret

@@ -16,8 +16,7 @@
 
 #viewer {
     position: relative;
-    width: 100%;
-    /* height: auto; */
+    max-width: 100%;
     overflow: hidden;
     margin: 0;
 }
@@ -25,7 +24,6 @@
 #viewer img {
     display: block;
     width: 100%;
-    /* height: auto; */
     z-index: 1;
 }
 
@@ -86,7 +84,7 @@
     left: 0%;
     transform: translate(0%, 0%);
     -ms-transform: translate(0%, 0%);
-    opacity: 0.25;
+    opacity: 0.5;
     position: absolute;
     top: 0%;
     font-size: 0;
@@ -98,9 +96,17 @@
 }
 
 #viewer>.guides>svg>line {
-    stroke: green;
-    stroke-width: 5;
+    stroke-width: 3;
+}
+
+#viewer>.guides>svg>line.a {
+    stroke: black;
     stroke-dasharray: 1;
+}
+
+#viewer>.guides>svg>line.b {
+    stroke: white;
+    stroke-dasharray: 2;
 }
 
 #viewer>.next {

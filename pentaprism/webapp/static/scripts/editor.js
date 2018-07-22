@@ -123,13 +123,14 @@ function MakeArgsFromForm(full=false) {
     // if (grid != "") {args.grid = grid;}
     if ((gp != "2.2" || gs != "4.5") && gp != "" && gs != "") {args.gamma = `${gp},${gs}`;}
     if (h != "") {args.height = h;}
-    if (half) {args["half-size"] = "true";}
+    if (half && !full) {args["half-size"] = "true";}
     if (nab) {args["no-auto-bright"] = "true";}
     if (nas) {args["no-auto-scale"] = "true";}
     if (full && rot != "0" && rot != "") {args.rotate = rot;}
     if (sat != "") { args.saturation = sat;}
     if (w != "") {args.width = w;}
     if (wb != "") {args.wb = wb;}
+    if (full) {args.full = "true";}
 
     args_lst = [];
     for (var k in args) {
@@ -141,6 +142,11 @@ function MakeArgsFromForm(full=false) {
 
 function ReloadOnChange() {
     LoadImage(ParseArgs().id, MakeArgsFromForm())();
+}
+
+function DownloadImage() {
+    src = `/images/${ParseArgs().id}/?${MakeArgsFromForm(true)}`;
+    window.location = src;
 }
 
 function RotateImage(deg) {

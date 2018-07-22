@@ -95,35 +95,56 @@ class Images(Base):
         return '{} {}'.format(cr, self.timestamp.year)
 
     def pil_image(self, pp_args={}, watermark=None, width=None, height=None,
-                  crop=None, rotate=None):
+                  crop=None, rotate=0):
         img = Image.fromarray(self.raw_img.postprocess(**pp_args))
 
-        if rotate is not None:
+        if rotate != 0 or crop is not None:
+            if crop is None:
+                crop = [0, 0, 100, 100]
+
+            w, h = img.size
+
+            l = (crop[0] / 100.0)
+            t = (crop[1] / 100.0)
+            r = (crop[2] / 100.0)
+            b = (crop[3] / 100.0)
+
             A = float(rotate)
             A = math.fabs(math.radians(A))
             c = math.cos(A)
             s = math.sin(A)
+
+            sx = l * w
+            sy = t * h
+            dx = (1.0 - r) * w
+            dy = (1.0 - b) * h
+
+            crop_ = (int(sx),
+                     int(sy),
+                     int(w - dx),
+                     int(h - dy))
+
+            img = img.crop(crop_)
+
             w, h = img.size
 
             new_w = (h * s + w * c)
             new_h = (h * c + w * s)
-
             scale = min(w / new_w, h / new_h)
-
             d_w = ((w * (1 - scale)) / 2.0)
             d_h = ((h * (1 - scale)) / 2.0)
 
-            crop_ = (int(d_w), int(d_h), int(w - d_w), int(h - d_h))
+            scale_crop = (int(d_w),
+                          int(d_h),
+                          int(w - d_w),
+                          int(h - d_h))
 
-            img = img.rotate(-float(rotate)).crop(crop_)
+            print w, h
+            print scale
+            print d_w, d_h
+            print scale_crop
 
-        if crop is not None:
-            w, h = img.size
-            l = (crop[0] / 100.0) * w
-            t = (crop[1] / 100.0) * h
-            r = (crop[2] / 100.0) * w
-            b = (crop[3] / 100.0) * h
-            img = img.crop((l, t, r, b))
+            img = img.rotate(-float(rotate)).crop(scale_crop)
 
         if width is not None or height is not None:
             w, h = img.size
