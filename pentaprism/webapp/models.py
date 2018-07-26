@@ -139,11 +139,6 @@ class Images(Base):
                           int(w - d_w),
                           int(h - d_h))
 
-            print w, h
-            print scale
-            print d_w, d_h
-            print scale_crop
-
             img = img.rotate(-float(rotate)).crop(scale_crop)
 
         if width is not None or height is not None:

@@ -17,103 +17,204 @@
     <script src="/ui/scripts/util.js"></script>
     <script src="/ui/scripts/editor.js"></script>
 
-    <link rel="stylesheet" href="/ui/style/gallery.css">
+    <link rel="stylesheet" href="/ui/style/common.css">
+    <link rel="stylesheet" href="/ui/style/editor.css">
 </head>
 
 <body>
-    <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="#">Pentaprism</a>
             <ul class="navbar-nav mr-auto"></ul>
         </nav>
         <div class="row">
-            <div id="viewer" class="text-center">
-                <img class="storage" />
-                <canvas id="image-container"></canvas>
-                <div class="guides">
-                    <svg class="thirds" width="100%" height="100%">
-                        <line class="a" x1="33.333%" y1="0" x2="33.333%" y2="100%" />
-                        <line class="a" x1="66.667%" y1="0" x2="66.667%" y2="100%" />
-                        <line class="a" x1="0" y1="33.333%" x2="100%" y2="33.333%" />
-                        <line class="a" x1="0" y1="66.667%" x2="100%" y2="66.667%" />
-                        <line class="b" x1="33.333%" y1="0" x2="33.333%" y2="100%" />
-                        <line class="b" x1="66.667%" y1="0" x2="66.667%" y2="100%" />
-                        <line class="b" x1="0" y1="33.333%" x2="100%" y2="33.333%" />
-                        <line class="b" x1="0" y1="66.667%" x2="100%" y2="66.667%" />
-                    </svg>
-                    <svg class="triangles1" width="100%" height="100%">
-                        <line class="a" x1="0" y1="0" x2="100%" y2="100%" />
-                        <line class="left a" x1="0" y1="100%" x2="0" y2="0" />
-                        <line class="right a"x1="100%" y1="0" x2="0" y2="0" />
-                        <line class="b" x1="0" y1="0" x2="100%" y2="100%" />
-                        <line class="left b" x1="0" y1="100%" x2="0" y2="0" />
-                        <line class="right b"x1="100%" y1="0" x2="0" y2="0" />
-                    </svg>
-                    <svg class="triangles2" width="100%" height="100%">
-                        <line class="a" x1="0" y1="100%" x2="100%" y2="0" />
-                        <line class="left a" x1="0" y1="0" x2="0" y2="0" />
-                        <line class="right a"x1="100%" y1="100%" x2="0" y2="0" />
-                        <line class="b" x1="0" y1="100%" x2="100%" y2="0" />
-                        <line class="left b" x1="0" y1="0" x2="0" y2="0" />
-                        <line class="right b"x1="100%" y1="100%" x2="0" y2="0" />
-                    </svg>
+            <div class="col-3">
+                <div class="row">
+                    <div class="col">
+                        <button id="render" class="btn btn-primary btn-lg btn-block" onclick="DownloadImage()">Render</button>
+                    </div>
                 </div>
-                <div class="loading"><h1>Loading</h1></div>
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="tfmHeading">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#tfmCard" aria-expanded="true" aria-controls="collapseOne">
+                                    Transform
+                                </button>
+                            </h5>
+                        </div>
+                
+                        <div id="tfmCard" class="collapse" aria-labelledby="tfmHeading" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="rot" class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-10" data-slider-max="10" data-slider-step="0.1"
+                                            data-slider-value="0" />
+                                    </div>
+                                    <div class="col-3">
+                                        <label id="rotlabel" for="rot">Rotation</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="width" type="text" value="" class="form-control" />
+                                        <label for="width">Width</label>
+                                    </div>
+                                    <div class="col">
+                                        <input id="height" type="text" value="" class="form-control" />
+                                        <label for="height">Height</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="left" class="form-control" data-slider-id='leftSlider' type="text" data-slider-min="0.0" data-slider-max="100.0"
+                                        data-slider-step="0.01" data-slider-value="0.0" />
+                                    </div>
+                                    <div class="col-3">
+                                        <span id="leftlabel">0.0</span>
+                                        <label for="left">Left</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="top" class="form-control" data-slider-id='topSlider' type="text" data-slider-min="0.0" data-slider-max="100.0"
+                                            data-slider-step="0.01" data-slider-value="0.0" />
+                                    </div>
+                                    <div class="col-3">
+                                        <span id="toplabel">0.0</span>
+                                        <label for="top">Top</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="right" class="form-control" data-slider-id='rightSlider' type="text" data-slider-min="0.0" data-slider-max="100.0"
+                                            data-slider-step="0.01" data-slider-value="100.0" />
+                                    </div>
+                                    <div class="col-3">
+                                        <span id="rightlabel">100.0</span>
+                                        <label for="right">Right</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="bottom" class="form-control" data-slider-id='bottomSlider' type="text" data-slider-min="0.0" data-slider-max="100.0"
+                                            data-slider-step="0.01" data-slider-value="100.0" />
+                                    </div>
+                                    <div class="col-3">
+                                        <span id="bottomlabel">100.0</span>
+                                        <label for="bottom">Bottom</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <button class="btn btn-primary btn-lg btn-block" onclick="ClearCrop()">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="colorHeading">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#colorCard" aria-expanded="true"
+                                    aria-controls="collapseOne">
+                                    Color
+                                </button>
+                            </h5>
+                        </div>
+                    
+                        <div id="colorCard" class="collapse" aria-labelledby="colorHeading" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <label for="wb">White Balance Mode</label>
+                                        <select name="wb" class="form-control">
+                                            <option value="" selected>None</option>
+                                            <option value="auto">Auto</option>
+                                            <option value="camera">Camera</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="expHeading">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#expCard" aria-expanded="true"
+                                    aria-controls="collapseOne">
+                                    Exposure
+                                </button>
+                            </h5>
+                        </div>
+                    
+                        <div id="expCard" class="collapse" aria-labelledby="expHeading" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="exp" class="form-control" data-slider-id='expSlider' type="text" data-slider-min="0.25"
+                                            data-slider-max="8" data-slider-step="0.25" data-slider-value="1">
+                                        <span id="explabel">1</span>
+                                        <label for="exp">Exposure</label>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="black" type="text" value="" class="form-control" />
+                                        <label for="black">Black</label>
+                                    </div>
+                                    <div class="col">
+                                        <input id="sat" type="text" value="" class="form-control" />
+                                        <label for="sat">Saturation</label>
+                                    </div>
+                                    <div class="col">
+                                        <input id="bright" type="text" value="" class="form-control" />
+                                        <label for="bright">Brightness</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                <div id="viewer" class="text-center">
+                    <img class="storage" />
+                    <canvas id="image-container"></canvas>
+                    <div class="guides">
+                        <svg class="thirds" width="100%" height="100%">
+                            <line class="a" x1="33.333%" y1="0" x2="33.333%" y2="100%" />
+                            <line class="a" x1="66.667%" y1="0" x2="66.667%" y2="100%" />
+                            <line class="a" x1="0" y1="33.333%" x2="100%" y2="33.333%" />
+                            <line class="a" x1="0" y1="66.667%" x2="100%" y2="66.667%" />
+                            <line class="b" x1="33.333%" y1="0" x2="33.333%" y2="100%" />
+                            <line class="b" x1="66.667%" y1="0" x2="66.667%" y2="100%" />
+                            <line class="b" x1="0" y1="33.333%" x2="100%" y2="33.333%" />
+                            <line class="b" x1="0" y1="66.667%" x2="100%" y2="66.667%" />
+                        </svg>
+                        <svg class="triangles1" width="100%" height="100%">
+                            <line class="a" x1="0" y1="0" x2="100%" y2="100%" />
+                            <line class="left a" x1="0" y1="100%" x2="0" y2="0" />
+                            <line class="right a" x1="100%" y1="0" x2="0" y2="0" />
+                            <line class="b" x1="0" y1="0" x2="100%" y2="100%" />
+                            <line class="left b" x1="0" y1="100%" x2="0" y2="0" />
+                            <line class="right b" x1="100%" y1="0" x2="0" y2="0" />
+                        </svg>
+                        <svg class="triangles2" width="100%" height="100%">
+                            <line class="a" x1="0" y1="100%" x2="100%" y2="0" />
+                            <line class="left a" x1="0" y1="0" x2="0" y2="0" />
+                            <line class="right a" x1="100%" y1="100%" x2="0" y2="0" />
+                            <line class="b" x1="0" y1="100%" x2="100%" y2="0" />
+                            <line class="left b" x1="0" y1="0" x2="0" y2="0" />
+                            <line class="right b" x1="100%" y1="100%" x2="0" y2="0" />
+                        </svg>
+                    </div>
+                    <div class="loading">
+                        <h1>Loading</h1>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                <button id="render" onclick="DownloadImage()">Render</button>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">White Balance</label>
-            <div class="col">
-                <label for="wb">Mode</label>
-                <select name="wb" class="form-control">
-                    <option value="" selected>None</option>
-                    <option value="auto">Auto</option>
-                    <option value="camera">Camera</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">Size &amp; Orientation</label>
-            <div class="col">
-                <input id="width" type="text" value="" class="form-control"/>
-                <label for="width">Width</label>
-            </div>
-            <div class="col">
-                <input id="height" type="text" value="" class="form-control"/>
-                <label for="height">Height</label>
-            </div>
-            <div class="col">
-                <input id="rot"  class="form-control" data-slider-id='rotSlider' type="text" data-slider-min="-10" data-slider-max="10" data-slider-step="0.1" data-slider-value="0" />
-                <span id="rotlabel">0</span>
-                <label for="rot">Rotation</label>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">Crop</label>
-            <div class="col">
-                <input id="left" type="text" value="" class="form-control" />
-                <label for="left">Left</label>
-            </div>
-            <div class="col">
-                <input id="top" type="text" value="" class="form-control" />
-                <label for="top">Top</label>
-            </div>
-            <div class="col">
-                <input id="right" type="text" value="" class="form-control" />
-                <label for="right">Right</label>
-            </div>
-            <div class="col">
-                <input id="bottom" type="text" value="" class="form-control" />
-                <label for="bottom">Bottom</label>
-            </div>
-            <div class="col">
-                <button onclick="ClearCrop()">Clear</button>
-            </div>
+            
         </div>
         <div class="form-group row">
             <label for="colFormLabel" class="col-sm-2 col-form-label">Options</label>
@@ -140,26 +241,6 @@
             <div class="col">
                 <label for="cr">Copyright</label>
                 <input class="form-control" id="cr" type="checkbox" checked/>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="colFormLabel" class="col-sm-2 col-form-label">Advanced</label>
-            <div class="col">
-                <input id="black" type="text" value="" class="form-control" />
-                <label for="black">Black</label>
-            </div>
-            <div class="col">
-                <input id="sat" type="text" value="" class="form-control" />
-                <label for="sat">Saturation</label>
-            </div>
-            <div class="col">
-                <input id="bright" type="text" value="" class="form-control" />
-                <label for="bright">Brightness</label>
-            </div>
-            <div class="col">
-                <input id="exp" class="form-control" data-slider-id='expSlider' type="text" data-slider-min="0.25" data-slider-max="8" data-slider-step="0.25" data-slider-value="1" >
-                <span id="explabel">1</span>
-                <label for="exp">Exposure</label>
             </div>
         </div>
         <div class="form-group row">

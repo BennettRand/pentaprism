@@ -60,3 +60,5 @@ target/
 \.raw_images/
 
 \.test\.db
+
+\.vscode/

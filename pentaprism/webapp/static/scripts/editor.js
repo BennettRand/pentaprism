@@ -27,15 +27,20 @@ function LoadImage(img_id, args) {
 
 function DrawImageOnCanvas(image, deg, crop) {
     canvas = $("#image-container")[0];
+    guides = $("#viewer>.guides")[0];
     ctx = canvas.getContext("2d");
     
     l = crop[0];
     t = crop[1];
     r = crop[2];
     b = crop[3];
+
+    console.log(image.width, image.height);
+    console.log(((r - l) / 100), ((b - t) / 100));
     
     canvas.width = image.width * ((r - l) / 100);
     canvas.height = image.height * ((b - t) / 100);
+    // guides.setAttribute("style", `width:${canvas.width}px;height:${canvas.height}px;`);
     sx = (l / 100) * image.width;
     sy = (t / 100) * image.height;
     w = canvas.width;
@@ -79,10 +84,10 @@ function EnforceCropRules() {
     if (r <= l) { r = l + 1; } if (r > 100) { r = 100; }
     if (b <= t) { b = t + 1; } if (b > 100) { b = 100; }
 
-    $("#left").val(l);
-    $("#top").val(t);
-    $("#right").val(r);
-    $("#bottom").val(b);
+    $("#left").slider('setValue',l);
+    $("#top").slider('setValue',t);
+    $("#right").slider('setValue',r);
+    $("#bottom").slider('setValue',b);
 
     return [l, t, r, b];
 }
@@ -154,9 +159,9 @@ function RotateImage(deg) {
     // $('#viewer>canvas').attr('style', `transform: rotate(${rad}rad) scale(${scale}, ${scale});`);
 }
 
-function RecalcTriangles(image) {
-    w = image.parentElement.clientWidth;
-    h = image.parentElement.clientHeight;
+function RecalcTriangles(canvas) {
+    w = canvas.width;
+    h = canvas.height;
     diag = Math.sqrt(w * w + h * h);
     alt = (w * h) / diag
     d2 = Math.cos(Math.atan(h / w)) * w
@@ -187,7 +192,8 @@ function SwitchGrid(e) {
 }
 
 function ClearCrop() {
-    $("#left,#top,#right,#bottom").val("");
+    $("#left,#top").slider("setValue", 0.0);
+    $("#right,#bottom").slider("setValue", 100.0);
     DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
 }
 
@@ -198,11 +204,31 @@ $(document).ready(() => {
         "#nautoscale", "#nautobright"];
     $(changable.join(",")).change(ReloadOnChange);
     $("select[name=grid]").change(SwitchGrid);
-    $("#left,#right,#top,#bottom").change(function () {
-        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules())
-    })
+    // $("#right,#top,#bottom").change(function () {
+    //     DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
+    // })
+    $("#left").slider({ tooltip: 'hide' }).on("slide", function (e) {
+        console.log(e);
+        $("#leftlabel").text(e.value);
+        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
+    });
+    $("#right").slider({ tooltip: 'hide' }).on("slide", function (e) {
+        console.log(e);
+        $("#rightlabel").text(e.value);
+        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
+    });
+    $("#top").slider({ tooltip: 'hide' }).on("slide", function (e) {
+        console.log(e);
+        $("#toplabel").text(e.value);
+        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
+    });
+    $("#bottom").slider({ tooltip: 'hide' }).on("slide", function (e) {
+        console.log(e);
+        $("#bottomlabel").text(e.value);
+        DrawImageOnCanvas($("#viewer>img")[0], $("#rot").val(), EnforceCropRules());
+    });
     $('#rot').slider({ tooltip: 'hide' }).on("slide", function (e) {
-        $("#rotlabel").text(e.value);
+        $("#rotlabel").text(`${e.value} Rotation`);
         DrawImageOnCanvas($("#viewer>img")[0], e.value, EnforceCropRules());
     });
     $('#gpower').slider({ tooltip: 'hide' }).on('slideStop', ReloadOnChange).on("slide", function (e) {

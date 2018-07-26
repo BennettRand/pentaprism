@@ -74,6 +74,7 @@ function LoadImage(img, data) {
         temp_image = new Image();
         
         temp_image.src = data;
+        $(temp_image).attr("class", "img-fluid preview");
         $(image).attr("class", "img-fluid");
         
         $("#viewer>a>img").replaceWith(temp_image);

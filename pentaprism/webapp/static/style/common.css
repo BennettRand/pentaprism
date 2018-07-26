@@ -1,0 +1,109 @@
+:root {
+    --primary: #37474f;
+    --primary-light: #62727b;
+    --primary-dark: #102027;
+
+    --secondary: #00838f;
+    --secondary-light: #4fb3bf;
+    --secondary-dark: #005662;
+
+    --primary-text: #fff;
+    --secondary-text: #fff;
+}
+
+/* body {
+    background-color: var(--primary-dark);
+    color: var(--primary-text);
+}
+
+a, .btn-link {
+    color: var(--primary-text);
+}
+
+a:hover, .btn-link:hover {
+    color: var(--secondary-light);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-dark);
+}
+
+.navbar {
+    background-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: var(--secondary);
+}
+
+.card {
+    border: 1px var(--secondary-dark);
+}
+
+.card-header {
+    background-color: var(--secondary);
+}
+
+.card-body {
+    background-color: var(--primary);
+}
+
+.slider-track-high, .slider-selection {
+    background: var(--secondary);
+}
+
+input, .form-control, .form-control:active, .form-control:focus {
+    background-color: var(--secondary);
+    color: var(--primary-text);
+    border: none;
+}
+
+.slider-handle {
+    background: var(--secondary-light);
+} */
+
+#thumbnails img {
+    width: 128px;
+}
+
+#viewer {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin: 0;
+}
+
+#viewer img {
+    display: block;
+    max-width: 100%;
+    max-height: 960px;
+    width: 1280px;
+    object-fit: contain;
+    z-index: 1;
+}
+
+#viewer img.preview {
+    width: 1280px;
+    object-fit: contain;
+}
+
+#viewer>.loading {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    opacity: 0.5;
+    position: absolute;
+    top: 50%;
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 0;
+}
+
+.slider.slider-horizontal {
+    width: 80% ;
+}

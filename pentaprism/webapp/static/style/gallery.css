@@ -10,34 +10,6 @@
     height: 110px;
 }
 
-#thumbnails img {
-    width: 128px;
-}
-
-#viewer {
-    position: relative;
-    max-width: 100%;
-    overflow: hidden;
-    margin: 0;
-}
-
-#viewer img {
-    display: block;
-    width: 100%;
-    z-index: 1;
-}
-
-#viewer img.storage {
-    display: none;
-}
-
-#viewer canvas {
-    display: block;
-    width: 100%;
-    /* height: auto; */
-    z-index: 1;
-}
-
 #viewer>button {
     position: absolute;
     top: 50%;
@@ -63,59 +35,8 @@
     -ms-transform: translate(0%, -50%);
 }
 
-#viewer>.loading {
-    left: 50%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    opacity: 0.5;
-    position: absolute;
-    top: 50%;
-    background-color: #555;
-    color: white;
-    font-size: 16px;
-    padding: 12px 24px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 0;
-}
-
-#viewer>.guides {
-    left: 0%;
-    transform: translate(0%, 0%);
-    -ms-transform: translate(0%, 0%);
-    opacity: 0.5;
-    position: absolute;
-    top: 0%;
-    font-size: 0;
-    padding: 0;
-    border: none;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#viewer>.guides>svg>line {
-    stroke-width: 3;
-}
-
-#viewer>.guides>svg>line.a {
-    stroke: black;
-    stroke-dasharray: 1;
-}
-
-#viewer>.guides>svg>line.b {
-    stroke: white;
-    stroke-dasharray: 2;
-}
-
 #viewer>.next {
     right: 0%;
     transform: translate(0%, -50%);
     -ms-transform: translate(0%, -50%);
-}
-
-
-.slider.slider-horizontal {
-    width: 80% ;
 }
