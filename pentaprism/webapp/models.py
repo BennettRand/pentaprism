@@ -1,9 +1,9 @@
 import base64
-import cStringIO
 import math
 import os
 import os.path
 from datetime import datetime
+from io import BytesIO
 
 import exifread
 import rawpy
@@ -52,7 +52,7 @@ class Images(Base):
 
         try:
             timestamp = self.get_timestamp()
-        except KeyError:
+        except (KeyError, TypeError):
             raise BadImageException()
 
         filepath = timestamp.strftime('%Y/%m-%b/%d')
@@ -158,7 +158,7 @@ class Images(Base):
         if watermark is not None:
             mark = Image.new("RGBA", img.size)
             draw = ImageDraw.ImageDraw(mark, "RGBA")
-            weight = img.size[0] / 40
+            weight = img.size[0] // 40
             offset = weight / 3
             font = ImageFont.truetype(
                 './pentaprism/webapp/static/style/Comfortaa-Regular.ttf',
@@ -179,7 +179,7 @@ class Images(Base):
             'demosaic_algorithm': rawpy.DemosaicAlgorithm.LINEAR},
             width=width)
 
-        buff = cStringIO.StringIO()
+        buff = BytesIO()
         pimg.save(buff, format="JPEG")
         return base64.b64encode(buff.getvalue())
 

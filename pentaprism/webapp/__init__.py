@@ -1,14 +1,12 @@
-import logging
 import multiprocessing
 import os
 from multiprocessing.pool import ThreadPool
-from os.path import join, getsize
-
+from os.path import join
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from .app import app
-from .models import Base, Images, ExifData, Thumbnails
+from .models import Base, Images, ExifData, Thumbnails, BadImageException
 
 
 def rebuild():
@@ -22,17 +20,21 @@ def rebuild():
     for root, dirs, files in os.walk(app.config['BASE_PATH']):
         for name in files:
             with open(join(root, name), 'rb') as f:
-                imf = Images(f, filename=name)
-                app.logger.info('Opened Image name=%s', imf.filename)
-                for k, v in imf.exif_dict.items():
-                    imf.exif.append(ExifData(key=k, value=v))
-                app.logger.info('Scanned EXIF name=%s len=%s',
-                                imf.filename, len(imf.exif_dict))
-                imf.thumbnail = Thumbnails(data=imf.b64_thumbnail())
-                app.logger.info('Created Thumbnail name=%s', imf.filename)
-                session.add(imf)
-                session.commit()
-                app.logger.info('Saved Image name=%s', imf.filename)
+                try:
+                    app.logger.info('Opening Image file=%s', name)
+                    imf = Images(f, filename=name)
+                    for k, v in imf.exif_dict.items():
+                        imf.exif.append(ExifData(key=k, value=v))
+                    app.logger.info('Scanned EXIF name=%s len=%s',
+                                    imf.filename, len(imf.exif_dict))
+                    imf.thumbnail = Thumbnails(data=imf.b64_thumbnail())
+                    app.logger.info('Created Thumbnail name=%s', imf.filename)
+                    session.add(imf)
+                    session.commit()
+                    app.logger.info('Saved Image name=%s', imf.filename)
+                except BadImageException:
+                    app.logger.warn('Could not process file path=%s', f.name)
+                    pass
 
     session.close()
 

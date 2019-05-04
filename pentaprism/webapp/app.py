@@ -1,5 +1,5 @@
-import cStringIO
 import os.path
+from io import BytesIO
 
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask.views import MethodView
@@ -213,7 +213,7 @@ class ImageView(MethodView):
             elif grid == 'triangles2':
                 pimg = Images.draw_triangles2(pimg, 3)
 
-            buff = cStringIO.StringIO()
+            buff = BytesIO()
             pimg.save(buff, format=fmt)
 
             ret = Response(buff.getvalue(), status=200,
@@ -240,7 +240,7 @@ def thumbnail(img_id):
         ret.status_code = 404
         return ret
 
-    ret = 'data:image/jpeg;base64,{}'.format(img.thumbnail.data)
+    ret = 'data:image/jpeg;base64,{}'.format(img.thumbnail.data.decode('utf-8'))
 
     session.close()
     return ret
