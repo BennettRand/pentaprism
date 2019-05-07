@@ -240,7 +240,10 @@ def thumbnail(img_id):
         ret.status_code = 404
         return ret
 
-    ret = 'data:image/jpeg;base64,{}'.format(img.thumbnail.data.decode('utf-8'))
+    image_data = img.thumbnail.data
+    if isinstance(image_data, bytes):
+        image_data = image_data.decode('utf-8')
+    ret = 'data:image/jpeg;base64,{}'.format(image_data)
 
     session.close()
     return ret
@@ -275,7 +278,7 @@ def dates():
         extract('year', Images.timestamp)).all()
 
     for y in years:
-        y = y[0]
+        y = int(y[0])
         ret[y] = {}
         months = session.query(
             extract('month', Images.timestamp)).filter(
@@ -283,14 +286,14 @@ def dates():
             extract('month', Images.timestamp)).all()
 
         for m in months:
-            m = m[0]
+            m = int(m[0])
             days = session.query(
                 extract('day', Images.timestamp)).filter(
                 extract('year', Images.timestamp) == y).filter(
                 extract('month', Images.timestamp) == m).distinct(
                 extract('day', Images.timestamp)).all()
 
-            ret[y][m] = [d[0] for d in days]
+            ret[y][m] = [int(d[0]) for d in days]
 
     session.close()
     return jsonify(ret)

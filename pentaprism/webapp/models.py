@@ -181,7 +181,7 @@ class Images(Base):
 
         buff = BytesIO()
         pimg.save(buff, format="JPEG")
-        return base64.b64encode(buff.getvalue())
+        return base64.b64encode(buff.getvalue()).decode('utf-8')
 
     # def get_zip(self):
     #     directory = os.path.join(FILE_BASE, self.filepath)
