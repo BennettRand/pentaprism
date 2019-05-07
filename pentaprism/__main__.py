@@ -1,24 +1,25 @@
 import argparse
 import logging
+from configparser import ConfigParser
 
 from .webapp import app, rebuild
 
 parser = argparse.ArgumentParser(
     description='RAW image storage and retrieval.')
 
-parser.add_argument('username', help='Auth Username')
-parser.add_argument('password', help='Auth Password')
-parser.add_argument('--base', help='Base Folder', default='./.raw_images/')
+parser.add_argument('config', type=argparse.FileType())
 parser.add_argument('--rebuild', help='Scan image folder and rebuild'
                     ' database', action='store_true')
 args = parser.parse_args()
 
 
 def main():
-    app.config['BASIC_AUTH_USERNAME'] = args.username
-    app.config['BASIC_AUTH_PASSWORD'] = args.password
-    app.config['BASE_PATH'] = args.base
-    app.config['DB_CSTRING'] = 'sqlite:///.test.db'
+    config = ConfigParser()
+    config.read_file(args.config)
+    app.config['BASIC_AUTH_USERNAME'] = config.get('auth', 'username')
+    app.config['BASIC_AUTH_PASSWORD'] = config.get('auth', 'password')
+    app.config['BASE_PATH'] = config.get('storage', 'photo_path')
+    app.config['DB_CSTRING'] = config.get('database', 'connection_string')
 
     app.logger.setLevel(logging.INFO)
 
