@@ -29,9 +29,9 @@ class ImageView(MethodView):
     def post(self, img_id=None):
         session = app.config['SESSION']()
         images = []
-        saved = []
-        skipped = []
-        errored = []
+        saved = set()
+        skipped = set()
+        errored = set()
         thumbnails = []
         replace = request.args.get('replace', None) is not None
 
@@ -50,28 +50,36 @@ class ImageView(MethodView):
                             rimg.exif.append(ExifData(key=k, value=v))
 
                         images.append(rimg)
-                        saved.append(rimg.filename)
+                        saved.add(rimg.filename)
                         thumbnails.append((rimg.filepath, rimg.filename))
                         app.logger.info('Saved File filename=%s',
                                         rimg.filename)
                     else:
-                        skipped.append(rimg.filename)
+                        skipped.add(rimg.filename)
                 except Exception as e:
                     fname = Images._try_get_name(f)
                     app.logger.error('Error Saving file filename=%s error=%s',
                                      fname, e)
-                    errored.append(fname)
+                    errored.add(fname)
 
         session.add_all(images)
         session.commit()
         session.close()
 
-        for t in thumbnails:
-            app.config['THREADPOOL'].apply_async(Images.make_thumbnail,
-                                                 args=(t, app),
-                                                 callback=thumbnail_cb)
+        thumb_map = {}
+        map_res = app.config['THREADPOOL'].starmap(
+            Images.make_thumbnail, ((t, app) for t in thumbnails))
+        for t, r in zip(thumbnails, map_res):
+            if r is None:
+                saved.remove(t[1])
+                errored.add(t[1])
+            else:
+                thumb_map[t[1]] = r
 
-        ret = jsonify(saved=saved, skipped=skipped, errored=errored)
+        ret = jsonify(saved=list(saved),
+                      skipped=list(skipped),
+                      errored=list(errored),
+                      thumbnails=thumb_map)
         ret.status_code = 201
         return ret
 
@@ -100,7 +108,7 @@ class ImageView(MethodView):
 
             ret = [{'id': i.id,
                     'name': i.filename,
-                    'timestamp': i.timestamp.isoformat(), 
+                    'timestamp': i.timestamp.isoformat(),
                     'links': {'image': '/images/{}/'.format(i.id),
                               'exif': '/images/{}/exif/'.format(i.id),
                               'thumbnail': '/images/{}/thumbnail/'.format(i.id)}
@@ -235,7 +243,7 @@ def thumbnail(img_id):
 
     img = session.query(Images).get(img_id)
 
-    if img is None:
+    if img is None or img.thumbnail is None:
         ret = jsonify(error='Not found', id=img_id)
         ret.status_code = 404
         return ret

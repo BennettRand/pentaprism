@@ -71,7 +71,10 @@ class Images(Base):
     @property
     def raw_img(self):
         if self._im is None:
-            self._im = rawpy.imread(self.file)
+            try:
+                self._im = rawpy.imread(self.file)
+            except rawpy._rawpy.LibRawFatalError as e:
+                raise BadImageException(e)
             self.file.seek(0)
 
         return self._im
@@ -104,7 +107,7 @@ class Images(Base):
 
             w, h = img.size
 
-            l = (crop[0] / 100.0)
+            left = (crop[0] / 100.0)
             t = (crop[1] / 100.0)
             r = (crop[2] / 100.0)
             b = (crop[3] / 100.0)
@@ -114,7 +117,7 @@ class Images(Base):
             c = math.cos(A)
             s = math.sin(A)
 
-            sx = l * w
+            sx = left * w
             sy = t * h
             dx = (1.0 - r) * w
             dy = (1.0 - b) * h
@@ -213,19 +216,21 @@ class Images(Base):
     def make_thumbnail(cls, f_path, app):
         session = app.config['SESSION']()
         img = None
+        added = None
 
+        f = open(os.path.join(app.config['BASE_PATH'], *f_path), 'rb')
+        img = cls.try_get_existing(cls(f, filename=f_path[-1]), session)
         try:
-            f = open(os.path.join(app.config['BASE_PATH'], *f_path), 'rb')
-            img = cls.try_get_existing(cls(f, filename=f_path[-1]), session)
             img.thumbnail = Thumbnails(data=img.b64_thumbnail())
+        except BadImageException:
+            app.logger.error('Could not make thumbnail path=%s', f_path)
+        else:
             session.add(img.thumbnail)
             session.commit()
-        except Exception as e:
-            return False, str(e)
+            added = img.id
         finally:
             session.close()
-
-        return True, img.filename
+        return added
 
     @classmethod
     def try_get_existing(cls, other, session):
@@ -260,12 +265,12 @@ class Images(Base):
         t_w = w / 3
         t_h = h / 3
 
-        l = ((t_w, 0), (t_w, h))
+        left = ((t_w, 0), (t_w, h))
         r = ((2 * t_w, 0), (2 * t_w, h))
         t = ((0, t_h), (w, t_h))
         b = ((0, 2 * t_h), (w, 2 * t_h))
 
-        draw.line(l, '#000', weight)
+        draw.line(left, '#000', weight)
         draw.line(r, '#000', weight)
         draw.line(t, '#000', weight)
         draw.line(b, '#000', weight)
@@ -279,14 +284,14 @@ class Images(Base):
         alt = (w * h) / diag
         d2 = int(math.cos(math.atan(float(h) / float(w))) * w)
         d1 = diag - d2
-        l = d1 * alt / h
+        left = d1 * alt / h
         b = d2 * alt / w
 
         draw = ImageDraw.Draw(img)
 
         d0 = ((0, 0), (w, h))
-        d1 = ((0, h), (l, h - b))
-        d2 = ((w, 0), (w - l, b))
+        d1 = ((0, h), (left, h - b))
+        d2 = ((w, 0), (w - left, b))
 
         draw.line(d0, '#000', weight)
         draw.line(d1, '#000', weight)
@@ -301,14 +306,14 @@ class Images(Base):
         alt = (w * h) / diag
         d2 = int(math.cos(math.atan(float(h) / float(w))) * w)
         d1 = diag - d2
-        l = d1 * alt / h
+        left = d1 * alt / h
         b = d2 * alt / w
 
         draw = ImageDraw.Draw(img)
 
         d0 = ((0, h), (w, 0))
-        d1 = ((0, 0), (l, b))
-        d2 = ((w, h), (w - l, h - b))
+        d1 = ((0, 0), (left, b))
+        d2 = ((w, h), (w - left, h - b))
 
         draw.line(d0, '#000', weight)
         draw.line(d1, '#000', weight)
@@ -336,4 +341,3 @@ class ExifData(Base):
     image = relationship("Images", back_populates="exif")
     key = Column(String(128))
     value = Column(String(128))
-
