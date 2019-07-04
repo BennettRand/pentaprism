@@ -1,0 +1,10 @@
+.file {
+    width: 160px;
+    margin: 32px;
+    float: left;
+}
+
+.file> * {
+    width: 100%;
+}
+
